@@ -32,20 +32,24 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // 1. Público
+                // 1. Público: Registro y Login
                 .requestMatchers("/auth/**").permitAll()
                 
-                // 2. Movimientos: Agregamos "/movimientos" explícito para evitar fallos de ruta
+                // 2. NUEVO: Ruta de Bienvenida/Home
+                // Permitimos que CUALQUIER rol entre aquí, el controlador se encarga de saludar
+                .requestMatchers("/home/**").authenticated()
+                
+                // 3. Movimientos: Solo Admin y Contador
                 .requestMatchers("/movimientos", "/movimientos/**")
                     .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_CONTADOR")
                 
-                // 3. Proyectos
+                // 4. Proyectos: Lectura para Admin/Propietario, Escritura solo Admin
                 .requestMatchers(HttpMethod.GET, "/proyectos", "/proyectos/**")
                     .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_PROPIETARIO")
                 .requestMatchers(HttpMethod.POST, "/proyectos", "/proyectos/**")
                     .hasAuthority("ROLE_ADMINISTRADOR")
                 
-                // 4. Cualquier otra ruta
+                // 5. Bloqueo por defecto
                 .anyRequest().authenticated()
             );
 
