@@ -30,6 +30,7 @@ public class UsuarioRepositoryAdapter implements UsuarioRepositoryPort {
 
     @Override
     public Optional<Usuario> buscarPorEmail(String email) {
+        // Buscamos la entidad y si existe, la transformamos a nuestro modelo de dominio
         return jpaRepository.findByEmail(email)
             .map(entity -> new Usuario(
                 entity.getIdUsuario(),
