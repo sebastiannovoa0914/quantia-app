@@ -8,7 +8,6 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // MÉTODO DE LOGIN (Ya lo tenías, mantenemos la lógica del token)
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap((res: any) => { 
@@ -17,31 +16,32 @@ export class AuthService {
           localStorage.setItem('token', res.token);
           localStorage.setItem('nombre', res.nombre || ''); 
           localStorage.setItem('rol', res.rol || '');
-          console.log('Datos guardados en LocalStorage');
+          
+          // --- ESTA ES LA LÍNEA QUE TE FALTABA ---
+          // Guardamos el ID que viene del Backend (AuthController)
+          localStorage.setItem('id_usuario', res.id); 
+          
+          console.log('Datos guardados en LocalStorage, incluyendo ID:', res.id);
         }
       })
     );
   }
 
-  // MÉTODO DE REGISTRO (Nuevo: Basado en tu captura de Postman)
   register(userData: any): Observable<any> {
-    // Estructuramos el objeto para que coincida exactamente con tu tabla de BD
     const body = {
       nombre: userData.nombre,
       email: userData.email,
       contrasena: userData.contrasena,
-      rol: 'ADMINISTRADOR', // Valor por defecto según tu Postman
-      activo: true        // Valor por defecto según tu Postman
+      rol: 'ADMINISTRADOR', 
+      activo: true
     };
     return this.http.post(`${this.apiUrl}/auth/register`, body);
   }
 
-  // OBTENER PERFIL
   getProfile(): Observable<any> {
     return this.http.get(`${this.apiUrl}/home/perfil`);
   }
 
-  // CERRAR SESIÓN
   logout() { 
     localStorage.clear(); 
     console.log('Sesión cerrada y storage limpio');

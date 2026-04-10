@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -27,18 +28,22 @@ public class AuthController {
         String email = credentials.get("email");
         String password = credentials.get("contrasena");
 
-        // 1. Obtenemos el token del servicio
+        // 1. Intentamos el login
         String token = usuarioService.login(email, password);
 
         if (token != null) {
-            // 2. Buscamos el usuario completo para obtener su nombre y rol reales
+            // 2. Buscamos el usuario
             Usuario user = usuarioService.buscarPorEmail(email);
             
-            // 3. Creamos la respuesta con las llaves que el Frontend espera
+            // 3. Preparamos la respuesta para Angular
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
-            response.put("nombre", user.getNombre()); // Viene del @Data de tu modelo
-            response.put("rol", user.getRol());       // Viene del @Data de tu modelo
+            response.put("nombre", user.getNombre());
+            response.put("rol", user.getRol());
+            
+            // CLAVE: Usamos .getId() porque así se llama en tu clase Usuario.java
+            // Esto enviará el ID real a Angular y ya no verás el 0 en los proyectos.
+            response.put("id", user.getId()); 
 
             return ResponseEntity.ok(response);
         } else {

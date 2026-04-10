@@ -1,0 +1,36 @@
+<div style="background: #0a0a0a; min-height: 100vh; padding: 40px; font-family: 'Segoe UI', sans-serif; color: white;">
+  
+    <div style="max-width: 1000px; margin: 0 auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h2 style="color: #2ecc71; margin: 0;">Propiedades Disponibles</h2>
+        <button [routerLink]="['/home']" style="background: #222; color: white; border: 1px solid #333; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+          Volver al Panel
+        </button>
+      </div>
+  
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+        
+        <div *ngFor="let p of proyectos" style="background: #111; border: 1px solid #222; border-radius: 12px; padding: 25px; position: relative;">
+          <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #2ecc71; border-radius: 12px 0 0 12px;"></div>
+          
+          <h3 style="color: white; margin: 0 0 10px 0;">{{ p.nombre }}</h3>
+          <p style="color: #888; font-size: 14px; line-height: 1.5; height: 45px; overflow: hidden;">{{ p.descripcion }}</p>
+          
+          <div style="display: flex; gap: 10px; margin-top: 20px; font-size: 12px; color: #555;">
+            <span>📅 {{ p.fecha_inicio }}</span>
+            <span>🏁 {{ p.fecha_fin }}</span>
+          </div>
+  
+          <div style="margin-top: 20px; background: #1a1a1a; padding: 12px; border-radius: 6px; border: 1px solid #2ecc7133;">
+            <small style="color: #2ecc71; text-transform: uppercase; font-size: 10px; font-weight: 800; display: block; margin-bottom: 4px;">Administrador Responsable</small>
+            <span style="color: #eee; font-weight: 600;">{{ p.nombreAdmin }}</span>
+          </div>
+        </div>
+  
+      </div>
+  
+      <div *ngIf="proyectos.length === 0" style="text-align: center; padding: 100px; color: #444;">
+        <p>No se encontraron propiedades registradas.</p>
+      </div>
+    </div>
+  </div>

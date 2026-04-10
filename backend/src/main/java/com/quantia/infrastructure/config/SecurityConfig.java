@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.Customizer;
 
 import java.util.List;
 
@@ -29,27 +30,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(Customizer.withDefaults()) // Usa el bean corsConfigurationSource de abajo
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // 1. Público: Registro y Login
+                // 1. Público
                 .requestMatchers("/auth/**").permitAll()
                 
-                // 2. NUEVO: Ruta de Bienvenida/Home
-                // Permitimos que CUALQUIER rol entre aquí, el controlador se encarga de saludar
+                // 2. Home y otros
                 .requestMatchers("/home/**").authenticated()
                 
-                // 3. Movimientos: Solo Admin y Contador
-                .requestMatchers("/movimientos", "/movimientos/**")
+                // 3. Movimientos
+                .requestMatchers("/api/movimientos/**")
                     .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_CONTADOR")
                 
-                // 4. Proyectos: Lectura para Admin/Propietario, Escritura solo Admin
-                .requestMatchers(HttpMethod.GET, "/proyectos", "/proyectos/**")
+                // 4. Proyectos (RUTAS CORREGIDAS CON /api/)
+                .requestMatchers(HttpMethod.GET, "/api/proyectos/**")
                     .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_PROPIETARIO")
-                .requestMatchers(HttpMethod.POST, "/proyectos", "/proyectos/**")
+                .requestMatchers(HttpMethod.POST, "/api/proyectos/**")
                     .hasAuthority("ROLE_ADMINISTRADOR")
                 
-                // 5. Bloqueo por defecto
                 .anyRequest().authenticated()
             );
 
@@ -66,9 +65,9 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedOrigins(List.of("http://localhost:4200")); // Origen de tu Angular
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

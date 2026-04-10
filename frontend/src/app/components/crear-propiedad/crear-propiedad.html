@@ -12,33 +12,40 @@
         <p style="color: #666; font-size: 14px; margin: 0;">Ingresa los detalles técnicos del nuevo inmueble en Fusagasugá.</p>
       </div>
   
-      <form style="display: flex; flex-direction: column; gap: 20px;">
+      <form (ngSubmit)="guardar()" #propiedadForm="ngForm" style="display: flex; flex-direction: column; gap: 20px;">
+        
         <div>
           <label style="display: block; color: #2ecc71; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Título de la Propiedad</label>
-          <input type="text" placeholder="Ej: Lote San Jorge Sector A" style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none;">
+          <input type="text" name="nombre" [(ngModel)]="proyecto.nombre" required placeholder="Ej: Lote San Jorge Sector A" 
+                 style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none;">
         </div>
   
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           <div>
-            <label style="display: block; color: #2ecc71; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Precio (COP)</label>
-            <input type="number" placeholder="0.00" style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none;">
+            <label style="display: block; color: #2ecc71; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Fecha Inicio</label>
+            <input type="date" name="fecha_inicio" [(ngModel)]="proyecto.fecha_inicio" required
+                   style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none;">
           </div>
           <div>
-            <label style="display: block; color: #2ecc71; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Área (m²)</label>
-            <input type="text" placeholder="Ej: 120" style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none;">
+            <label style="display: block; color: #2ecc71; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Fecha Fin (esperada)</label>
+            <input type="date" name="fecha_fin" [(ngModel)]="proyecto.fecha_fin" required
+                   style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none;">
           </div>
         </div>
   
         <div>
           <label style="display: block; color: #2ecc71; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Descripción Detallada</label>
-          <textarea rows="4" style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none; resize: none;"></textarea>
+          <textarea name="descripcion" [(ngModel)]="proyecto.descripcion" rows="4" 
+                    style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none; resize: none;"></textarea>
         </div>
   
-        <button type="submit" style="width: 100%; background: #2ecc71; color: #000; border: none; padding: 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 800; letter-spacing: 1px; margin-top: 10px; transition: 0.3s;"
+        <button type="submit" [disabled]="!propiedadForm.form.valid"
+                style="width: 100%; background: #2ecc71; color: #000; border: none; padding: 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 800; letter-spacing: 1px; margin-top: 10px; transition: 0.3s;"
                 onmouseover="this.style.backgroundColor='#27ae60'" 
                 onmouseout="this.style.backgroundColor='#2ecc71'">
-          GUARDAR PROPIEDAD EN SISTEMA
+          GUARDAR PROYECTO EN BASE DE DATOS
         </button>
+  
       </form>
     </div>
   </div>
