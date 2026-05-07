@@ -7,4 +7,5 @@ public interface EventoServicePort {
     void guardarEvento(Evento evento);
     List<Evento> obtenerEventosPorUsuario(Long idUsuario);
     void eliminarEvento(Long id);
+    List<Evento> obtenerTodosLosEventos();
 }

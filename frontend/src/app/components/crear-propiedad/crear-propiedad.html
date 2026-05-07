@@ -8,8 +8,14 @@
       <button [routerLink]="['/home']" style="background: transparent; border: none; color: #888; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; padding: 0;">
         ← Volver al Panel
       </button>
-      <h2 style="color: white; margin: 20px 0 5px 0; font-size: 24px;">Registrar Propiedad</h2>
-      <p style="color: #666; font-size: 14px; margin: 0;">Ingresa los detalles técnicos del nuevo inmueble en Fusagasugá.</p>
+      
+      <h2 style="color: white; margin: 20px 0 5px 0; font-size: 24px;">
+        {{ esEdicion ? 'Actualizar Datos de Propiedad' : 'Registrar Propiedad' }}
+      </h2>
+      
+      <p style="color: #666; font-size: 14px; margin: 0;">
+        {{ esEdicion ? 'Modifica los detalles técnicos del inmueble seleccionado.' : 'Ingresa los detalles técnicos del nuevo inmueble en Fusagasugá.' }}
+      </p>
     </div>
 
     <form (ngSubmit)="guardar()" #propiedadForm="ngForm" style="display: flex; flex-direction: column; gap: 20px;">
@@ -44,7 +50,7 @@
               style="width: 100%; background: #2ecc71; color: #000; border: none; padding: 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 800; letter-spacing: 1px; margin-top: 10px; transition: 0.3s;"
               onmouseover="this.style.backgroundColor='#27ae60'" 
               onmouseout="this.style.backgroundColor='#2ecc71'">
-        GUARDAR PROYECTO 
+        {{ esEdicion ? 'ACTUALIZAR PROYECTO' : 'GUARDAR PROYECTO' }}
       </button>
 
     </form>

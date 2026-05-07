@@ -30,4 +30,9 @@ public class EventoServiceImpl implements EventoServicePort {
     public void eliminarEvento(Long id) {
         repository.eliminar(id);
     }
+    @Override
+    public List<Evento> obtenerTodosLosEventos() {
+        // Llama al repositorio para traer todo sin filtros
+        return repository.findAll();
+    }
 }

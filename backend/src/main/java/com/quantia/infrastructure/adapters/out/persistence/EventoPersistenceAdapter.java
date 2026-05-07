@@ -20,7 +20,6 @@ public class EventoPersistenceAdapter implements EventoRepositoryPort {
 
     @Override
     public void guardar(Evento ev) {
-        // Creamos la entidad (Infraestructura) a partir del modelo (Dominio)
         EventoEntity entity = new EventoEntity();
         entity.setTitulo(ev.getTitulo());
         entity.setDia(ev.getDia());
@@ -32,19 +31,35 @@ public class EventoPersistenceAdapter implements EventoRepositoryPort {
 
     @Override
     public List<Evento> obtenerPorUsuario(Long idUsuario) {
-        // Convertimos la lista de entidades de MySQL a objetos de dominio
-        return repository.findByIdUsuario(idUsuario).stream().map(e -> {
-            Evento ev = new Evento();
-            ev.setId(e.getId());
-            ev.setTitulo(e.getTitulo());
-            ev.setDia(e.getDia());
-            ev.setMesAnio(e.getMesAnio());
-            ev.setIdUsuario(e.getIdUsuario()); // No olvides este para mantener el vínculo
-            return ev;
-        }).collect(Collectors.toList());
+        return repository.findByIdUsuario(idUsuario).stream()
+                .map(this::mapToDomain)
+                .collect(Collectors.toList());
     }
+
+    // --- NUEVO MÉTODO PARA LA AGENDA COMPARTIDA ---
+    @Override
+    public List<Evento> findAll() {
+        // Trae todos los registros de la DB y los convierte al modelo de Dominio
+        return repository.findAll().stream()
+                .map(this::mapToDomain)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public void eliminar(Long id) {
         repository.deleteById(id);
+    }
+
+    /**
+     * Método auxiliar para no repetir código de conversión
+     */
+    private Evento mapToDomain(EventoEntity entity) {
+        Evento ev = new Evento();
+        ev.setId(entity.getId());
+        ev.setTitulo(entity.getTitulo());
+        ev.setDia(entity.getDia());
+        ev.setMesAnio(entity.getMesAnio());
+        ev.setIdUsuario(entity.getIdUsuario());
+        return ev;
     }
 }

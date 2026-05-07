@@ -8,4 +8,5 @@ public interface EventoRepositoryPort {
     void guardar(Evento evento);
     List<Evento> obtenerPorUsuario(Long idUsuario);
     void eliminar(Long id);
+    List<Evento> findAll();
 }

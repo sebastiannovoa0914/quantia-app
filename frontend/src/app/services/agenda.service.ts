@@ -8,8 +8,9 @@ export class AgendaService {
 
   constructor(private http: HttpClient) {}
 
-  listarPorUsuario(idUsuario: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${idUsuario}`);
+  // CAMBIO: Ahora no recibe ID, pide la agenda global
+  listarEventos(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
   }
 
   guardar(evento: any): Observable<any> {

@@ -116,18 +116,27 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   cargarAgendaReal(): void {
-    if (this.idUsuario) {
-      this.agendaService.listarPorUsuario(this.idUsuario).subscribe({
-        next: (eventos) => {
-          this.agendaEventos = {};
-          eventos.forEach(ev => {
-            this.agendaEventos[ev.dia] = { id: ev.id, titulo: ev.titulo };
-          });
-          this.cd.detectChanges();
-        },
-        error: (err) => console.error('Error al cargar agenda:', err)
-      });
-    }
+    // 1. Ya no dependemos del if(this.idUsuario) para cargar, 
+    // porque la agenda ahora es global para los administradores.
+    this.agendaService.listarEventos().subscribe({ // Usamos el nuevo método del servicio
+      next: (eventos) => {
+        this.agendaEventos = {};
+        
+        eventos.forEach(ev => {
+          // Mapeamos los eventos al objeto del calendario usando el día como llave
+          this.agendaEventos[ev.dia] = { 
+            id: ev.id, 
+            titulo: ev.titulo 
+          };
+        });
+        
+        console.log('Agenda cargada con éxito (Modo Global)');
+        this.cd.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al cargar agenda global:', err);
+      }
+    });
   }
 
   // --- Acciones de Proyectos (Menú de tres puntos) ---
@@ -188,30 +197,35 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   guardarEvento() {
-    if (this.diaSeleccionado !== null && this.idUsuario) {
+    if (this.diaSeleccionado !== null) { // Quitamos la dependencia obligatoria de idUsuario
       const textoTrim = this.nuevoEventoTexto.trim();
       if (textoTrim !== '') {
         
-        // 1. Buscamos si ya existe un evento para este día en nuestro objeto local
         const eventoExistente = this.agendaEventos[this.diaSeleccionado];
   
-        const eventoRequest = {
-          // Si existe, le pasamos su ID; si no, queda null y Spring Boot crea uno nuevo
-          id: eventoExistente ? eventoExistente.id : null, 
+        const eventoRequest: any = {
           titulo: textoTrim,
           dia: this.diaSeleccionado,
           mesAnio: this.mesActual,
-          idUsuario: this.idUsuario
+          idUsuario: this.idUsuario // Lo dejamos por si tu DB lo requiere, pero ya no es el filtro
         };
   
-        console.log('Enviando a la agenda:', eventoRequest);
+        // Si es una edición, agregamos el ID; si es nuevo, NO enviamos la propiedad 'id'
+        if (eventoExistente && eventoExistente.id) {
+          eventoRequest.id = eventoExistente.id;
+        }
+  
+        console.log('Enviando a la agenda global:', eventoRequest);
   
         this.agendaService.guardar(eventoRequest).subscribe({
           next: () => {
             this.cerrarModal();
-            this.refrescarTodo();
+            this.refrescarTodo(); // Asegúrate de que refrescarTodo use el nuevo listarEventos() sin ID
           },
-          error: (err) => console.error('Error al procesar evento:', err)
+          error: (err) => {
+            console.error('Error al procesar evento:', err);
+            alert('No se pudo guardar el evento. Revisa la consola.');
+          }
         });
       }
     }

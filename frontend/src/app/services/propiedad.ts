@@ -62,10 +62,19 @@ export class ProyectoService {
     );
   }
   obtenerProyectoPorId(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    // Ahora sí lleva la llave para abrir la puerta del backend
+    return this.http.get<any>(`${this.apiUrl}/${id}`, { headers });
   }
+  
   actualizarProyecto(id: number, proyecto: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, proyecto).pipe(
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    });
+    return this.http.put(`${this.apiUrl}/${id}`, proyecto, { headers }).pipe(
       tap(() => this._refreshNeeded$.next())
     );
   }

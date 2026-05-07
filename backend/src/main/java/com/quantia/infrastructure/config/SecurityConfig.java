@@ -42,15 +42,15 @@ public class SecurityConfig {
 
                 // 3. MOVIMIENTOS
                 .requestMatchers("/api/movimientos/**")
-                    .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_CONTADOR")
+                    .hasAnyAuthority("ADMINISTRADOR", "CONTADOR")
                 
                 // 4. PROYECTOS (Lectura y Escritura)
                 .requestMatchers(HttpMethod.GET, "/api/proyectos/**")
-                    .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_PROPIETARIO", "ROLE_CONTADOR")
-                .requestMatchers(HttpMethod.POST, "/api/proyectos/**").hasAuthority("ROLE_ADMINISTRADOR")
-                .requestMatchers(HttpMethod.PUT, "/api/proyectos/**").hasAuthority("ROLE_ADMINISTRADOR") // Edición completa
-                .requestMatchers(HttpMethod.PATCH, "/api/proyectos/**").hasAuthority("ROLE_ADMINISTRADOR") // Progreso
-                .requestMatchers(HttpMethod.DELETE, "/api/proyectos/**").hasAuthority("ROLE_ADMINISTRADOR")
+                    .hasAnyAuthority("ADMINISTRADOR", "PROPIETARIO", "CONTADOR")
+                .requestMatchers(HttpMethod.POST, "/api/proyectos/**").hasAuthority("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.PUT, "/api/proyectos/**").hasAuthority("ADMINISTRADOR") // Edición completa
+                .requestMatchers(HttpMethod.PATCH, "/api/proyectos/**").hasAuthority("ADMINISTRADOR") // Progreso
+                .requestMatchers(HttpMethod.DELETE, "/api/proyectos/**").hasAuthority("ADMINISTRADOR")
 
                 // 5. AGENDA Y HOME
                 .requestMatchers("/api/agenda/**").authenticated()

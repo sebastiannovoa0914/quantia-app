@@ -23,19 +23,17 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Buscamos el usuario en la base de datos quantia_db
         UsuarioEntity user = repository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
-
-        // Sincronización de Roles:
-        // En la BD aparece como "ADMINISTRADOR".
-        // Para que Spring Security y el JWT hagan match, le concatenamos "ROLE_".
-        String roleName = user.getRol().toString(); // Funciona para Enum o String
+    
+        // Sincronización de Roles para Quantia:
+        // NO concatenamos "ROLE_". Usamos el nombre literal de la DB.
+        String roleName = user.getRol().toString(); 
         
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_" + roleName)
+            new SimpleGrantedAuthority(roleName) // Esto pasará "ADMINISTRADOR"
         );
-
+    
         return User.builder()
             .username(user.getEmail())
             .password(user.getContrasena())

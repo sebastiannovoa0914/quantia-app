@@ -30,9 +30,10 @@ public class EventoController {
         return ResponseEntity.ok(Map.of("mensaje", "Evento guardado"));
     }
 
-    @GetMapping("/{idUsuario}")
-    public ResponseEntity<List<Evento>> listar(@PathVariable Long idUsuario) {
-        return ResponseEntity.ok(service.obtenerEventosPorUsuario(idUsuario));
+    @GetMapping
+    public ResponseEntity<List<Evento>> listarTodo() {
+        // Aquí el service debería llamar a un findAll() general
+        return ResponseEntity.ok(service.obtenerTodosLosEventos()); 
     }
 
     // --- AÑADE ESTE MÉTODO ---
