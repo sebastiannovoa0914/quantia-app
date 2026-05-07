@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:8.0
+    platform: linux/amd64
+    container_name: quantia-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: quantia_db
+      MYSQL_ROOT_PASSWORD: root  
+    ports:
+      - "3307:3306" # Mantiene el 3307 para herramientas externas (DBeaver/Workbench)
+    networks:
+      - quantia-net
+
+  backend:
+    build: ./backend
+    container_name: quantia-backend
+    platform: linux/amd64
+    # CAMBIO: Se agrega ports para que el frontend (navegador) pueda conectar con Spring Boot
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - quantia-net
+      
+
+  frontend:
+    build: ./frontend
+    container_name: quantia-frontend
+    platform: linux/amd64
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - quantia-net
+
+networks:
+  quantia-net:
+    driver: bridge

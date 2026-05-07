@@ -15,36 +15,61 @@ public class ProyectoController {
 
     private final ProyectoServicePort proyectoService;
 
-    // Inyectamos el puerto de entrada (Arquitectura Hexagonal)
     public ProyectoController(ProyectoServicePort proyectoService) {
         this.proyectoService = proyectoService;
     }
 
-    /**
-     * Endpoint para obtener todas las propiedades/proyectos.
-     * Este es el que hace que la interfaz de "Explorar" muestre datos.
-     */
     @GetMapping
     public ResponseEntity<List<Proyecto>> listarProyectos() {
         List<Proyecto> proyectos = proyectoService.obtenerTodos();
         return ResponseEntity.ok(proyectos);
     }
 
-    /**
-     * Endpoint para guardar un nuevo proyecto.
-     */
     @PostMapping
     public ResponseEntity<?> crearProyecto(@RequestBody Proyecto proyecto) {
-        // 1. Confirmación técnica en consola
         System.out.println("Proyecto recibido para guardar: " + proyecto.getNombre());
-        
-        // 2. Ejecución de la lógica de negocio a través del puerto
         Proyecto proyectoGuardado = proyectoService.crearProyecto(proyecto);
         
-        // 3. Respuesta estructurada al Frontend
         return ResponseEntity.ok(Map.of(
             "mensaje", "Proyecto guardado exitosamente en la base de datos",
             "id", proyectoGuardado.getId_proyecto()
         ));
+    }
+
+    /**
+     * Endpoint para actualizar el progreso de la barra.
+     */
+    @PatchMapping("/{id}/progreso")
+    public ResponseEntity<?> actualizarProgreso(
+            @PathVariable Long id, 
+            @RequestBody Map<String, Object> body) {
+        
+        try {
+            if (body.containsKey("progreso")) {
+                Integer nuevoProgreso = (Integer) body.get("progreso");
+                proyectoService.actualizarProgreso(id, nuevoProgreso);
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.badRequest().body("El campo 'progreso' es obligatorio");
+            
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al actualizar progreso: " + e.getMessage());
+        }
+    }
+
+    /**
+     * NUEVO: Endpoint para eliminar un proyecto por su ID.
+     * Este método es el que llamará el botón de eliminar desde Angular.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarProyecto(@PathVariable Long id) {
+        try {
+            // Llamamos al puerto de entrada del servicio
+            proyectoService.eliminarProyecto(id);
+            return ResponseEntity.ok(Map.of("mensaje", "Proyecto eliminado exitosamente"));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of("error", "Error al eliminar el proyecto: " + e.getMessage()));
+        }
     }
 }

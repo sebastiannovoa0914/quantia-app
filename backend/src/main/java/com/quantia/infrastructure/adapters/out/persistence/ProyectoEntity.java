@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "proyectos") // Debe ser el nombre exacto de tu tabla en MySQL
+@Table(name = "proyectos")
 @Data
 public class ProyectoEntity {
 
@@ -25,4 +25,8 @@ public class ProyectoEntity {
 
     @Column(name = "id_usuario_admin")
     private Long idUsuarioAdmin;
+
+    // Nuevo campo para la barra de progreso
+    @Column(name = "progreso")
+    private Integer progreso; 
 }

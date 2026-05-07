@@ -13,7 +13,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.Customizer;
-
 import java.util.List;
 
 @Configuration
@@ -29,31 +28,41 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .cors(Customizer.withDefaults()) // Usa el bean corsConfigurationSource de abajo
+            .csrf(csrf -> csrf.disable()) 
+            .cors(Customizer.withDefaults()) 
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // 1. Público
-                .requestMatchers("/auth/**").permitAll()
-                
-                // 2. Home y otros
-                .requestMatchers("/home/**").authenticated()
-                
-                // 3. Movimientos
+                // 1. PERMITIR PRE-FLIGHT (CORS)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // 2. RUTAS PÚBLICAS (Registro y Login)
+                // Se agregan todas las variantes para evitar el 403 "fantasma"
+                .requestMatchers("/auth/**", "/api/auth/**").permitAll()
+                .requestMatchers("/auth/register", "/auth/login", "/api/auth/register", "/api/auth/login").permitAll()
+
+                // 3. MOVIMIENTOS
                 .requestMatchers("/api/movimientos/**")
                     .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_CONTADOR")
                 
-                // 4. Proyectos (RUTAS CORREGIDAS CON /api/)
+                // 4. PROYECTOS (Lectura y Escritura)
                 .requestMatchers(HttpMethod.GET, "/api/proyectos/**")
-                    .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_PROPIETARIO")
-                .requestMatchers(HttpMethod.POST, "/api/proyectos/**")
-                    .hasAuthority("ROLE_ADMINISTRADOR")
-                
+                    .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_PROPIETARIO", "ROLE_CONTADOR")
+                .requestMatchers(HttpMethod.POST, "/api/proyectos/**").hasAuthority("ROLE_ADMINISTRADOR")
+                .requestMatchers(HttpMethod.PUT, "/api/proyectos/**").hasAuthority("ROLE_ADMINISTRADOR") // Edición completa
+                .requestMatchers(HttpMethod.PATCH, "/api/proyectos/**").hasAuthority("ROLE_ADMINISTRADOR") // Progreso
+                .requestMatchers(HttpMethod.DELETE, "/api/proyectos/**").hasAuthority("ROLE_ADMINISTRADOR")
+
+                // 5. AGENDA Y HOME
+                .requestMatchers("/api/agenda/**").authenticated()
+                .requestMatchers("/home/**", "/api/home/**").authenticated()
+
+                // 6. CUALQUIER OTRA PETICIÓN
                 .anyRequest().authenticated()
             );
 
+        // Filtro JWT antes del filtro de usuario/contraseña
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+        
         return http.build();
     }
 
@@ -63,12 +72,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200")); // Origen de tu Angular
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+        config.setAllowedOrigins(List.of("http://localhost:4200")); 
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control", "Origin", "Accept"));
         config.setAllowCredentials(true);
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

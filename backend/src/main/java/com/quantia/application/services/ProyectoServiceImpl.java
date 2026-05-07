@@ -21,7 +21,19 @@ public class ProyectoServiceImpl implements ProyectoServicePort {
     }
 
     @Override
+    public void actualizarProgreso(Long id, Integer progreso) {
+        proyectoRepository.actualizarProgreso(id, progreso);
+    }
+
+    @Override
     public List<Proyecto> obtenerTodos() {
         return proyectoRepository.listarTodos();
+    }
+
+    // AÑADE ESTO PARA QUITAR EL ERROR
+    @Override
+    public void eliminarProyecto(Long id) {
+        // Le pedimos al puerto de salida (repositorio) que haga el trabajo sucio
+        proyectoRepository.eliminar(id);
     }
 }

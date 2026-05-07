@@ -1,13 +1,16 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing'; // Necesario para servicios que usan HttpClient
+import { ProyectoService } from './propiedad'; // Importamos la clase correcta desde el archivo propiedad.ts
 
-import { Propiedad } from './propiedad';
-
-describe('Propiedad', () => {
-  let service: Propiedad;
+describe('ProyectoService', () => {
+  let service: ProyectoService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Propiedad);
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule], // Agregamos esto para que no falle por el HttpClient
+      providers: [ProyectoService]
+    });
+    service = TestBed.inject(ProyectoService);
   });
 
   it('should be created', () => {

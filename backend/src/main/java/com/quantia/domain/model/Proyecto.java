@@ -16,4 +16,7 @@ public class Proyecto {
     private LocalDate fecha_fin;
     private Long id_usuario_admin;
     private String nombreAdmin;
+    
+    // Este es el campo que faltaba para la barra de progreso
+    private Integer progreso;
 }
