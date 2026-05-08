@@ -105,6 +105,11 @@
                         style="background: rgba(46,204,113,0.1); border: 1px solid #2ecc71; color: #2ecc71; padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 12px;">
                   <span>✏️</span> Editar
                 </button>
+                <button (click)="verUbicacion(p.latitud, p.longitud)" 
+            style="background: rgba(46,204,113,0.1); border: 1px solid #2ecc71; color: #2ecc71; padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 12px;"
+            title="Ver ubicación en Google Maps">
+      <span>📍</span> Mapa
+    </button>
 
                 <button (click)="confirmarEliminar(p.id, p.nombre)" 
                         style="background: rgba(231,76,60,0.1); border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 12px;">

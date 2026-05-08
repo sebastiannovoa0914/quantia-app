@@ -6,7 +6,13 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
+import java.util.List;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Date;
+import java.util.function.Function;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,9 +44,18 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Método útil para que el Filtro pueda ver qué roles trae el token
+        // Método actualizado para asegurar la extracción limpia de la lista
     public List<String> extractRoles(String token) {
-        return extractClaim(token, claims -> claims.get("roles", List.class));
+        return extractClaim(token, claims -> {
+            Object roles = claims.get("roles");
+            if (roles instanceof List<?>) {
+                // Convertimos cada elemento a String para evitar problemas de casteo
+                return ((List<?>) roles).stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toList());
+            }
+            return Collections.emptyList();
+        });
     }
 
     public String extractEmail(String token) {

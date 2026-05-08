@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core'; // Añadimos OnInit
-import { Router, RouterModule, ActivatedRoute } from '@angular/router'; // Añadimos ActivatedRoute
+import { Component, OnInit, AfterViewInit } from '@angular/core'; // Añadimos AfterViewInit
+import { Router, RouterModule, ActivatedRoute } from '@angular/router'; 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ProyectoService } from '../../services/propiedad'; 
 import Swal from 'sweetalert2';
+import * as L from 'leaflet'; // Importamos Leaflet
 
 @Component({
   selector: 'app-crear-propiedad',
@@ -12,7 +13,7 @@ import Swal from 'sweetalert2';
   templateUrl: './crear-propiedad.html',
   styleUrls: ['./crear-propiedad.css']
 })
-export class CrearPropiedad implements OnInit {
+export class CrearPropiedad implements OnInit, AfterViewInit {
 
   proyecto: any = {
     nombre: '',
@@ -20,20 +21,25 @@ export class CrearPropiedad implements OnInit {
     fecha_fin: '',
     descripcion: '',
     estado: 'ACTIVO',
-    progreso: 0
+    progreso: 0,
+    latitud: 4.33646, // Coordenadas por defecto (Fusa)
+    longitud: -74.36378
   };
 
   esEdicion: boolean = false;
   idProyectoEdicion: number | null = null;
 
+  // Variables para el mapa
+  private map: any;
+  private marker: any;
+
   constructor(
     private proyectoService: ProyectoService,
     private router: Router,
-    private route: ActivatedRoute // Para detectar el ID en la URL
+    private route: ActivatedRoute 
   ) {}
 
   ngOnInit(): void {
-    // Verificamos si viene un ID por parámetro (ej: /crear-propiedad?id=5)
     const idParam = this.route.snapshot.queryParamMap.get('id');
     
     if (idParam) {
@@ -43,19 +49,69 @@ export class CrearPropiedad implements OnInit {
     }
   }
 
+  // Inicializamos el mapa después de que la vista cargue
+  ngAfterViewInit(): void {
+    this.initMap();
+  }
+
+  private initMap(): void {
+    // Usar coordenadas del proyecto o las de Fusa por defecto
+    const lat = this.proyecto.latitud || 4.33646;
+    const lng = this.proyecto.longitud || -74.36378;
+
+    this.map = L.map('map', {
+      center: [lat, lng],
+      zoom: 15
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    this.marker = L.marker([lat, lng], {
+      draggable: true
+    }).addTo(this.map);
+
+    // Actualizar coordenadas al mover marcador
+    this.marker.on('dragend', () => {
+      const position = this.marker.getLatLng();
+      this.proyecto.latitud = position.lat;
+      this.proyecto.longitud = position.lng;
+    });
+
+    // Mover marcador al hacer clic en el mapa
+    this.map.on('click', (e: any) => {
+      this.marker.setLatLng(e.latlng);
+      this.proyecto.latitud = e.latlng.lat;
+      this.proyecto.longitud = e.latlng.lng;
+    });
+
+    // Ajuste de tamaño para evitar errores de renderizado
+    setTimeout(() => {
+      this.map.invalidateSize();
+    }, 200);
+  }
+
   cargarDatosParaEditar(id: number): void {
-    // Nota: Necesitas el método obtenerProyectoPorId en tu servicio
     this.proyectoService.obtenerProyectoPorId(id).subscribe({
       next: (data) => {
-        // Rellenamos el objeto proyecto con lo que viene de la BD
         this.proyecto = {
           nombre: data.nombre,
           fecha_inicio: data.fecha_inicio,
           fecha_fin: data.fecha_fin,
           descripcion: data.descripcion,
           estado: data.estado,
-          progreso: data.progreso
+          progreso: data.progreso,
+          latitud: data.latitud, // Cargamos latitud de la BD
+          longitud: data.longitud // Cargamos longitud de la BD
         };
+
+        // Si el mapa ya existe, movemos el marcador a la posición guardada
+        if (this.map && this.proyecto.latitud) {
+          const coords = new L.LatLng(this.proyecto.latitud, this.proyecto.longitud);
+          this.map.setView(coords, 15);
+          this.marker.setLatLng(coords);
+        }
       },
       error: (err) => {
         console.error('Error al cargar datos:', err);
@@ -65,7 +121,6 @@ export class CrearPropiedad implements OnInit {
   }
 
   guardar(): void {
-    // 1. VALIDACIÓN DE LÓGICA DE NEGOCIO
     if (this.proyecto.fecha_inicio && this.proyecto.fecha_fin) {
       const inicio = new Date(this.proyecto.fecha_inicio);
       const fin = new Date(this.proyecto.fecha_fin);
@@ -79,19 +134,16 @@ export class CrearPropiedad implements OnInit {
           background: '#111',
           color: '#fff'
         });
-        return; // CORTA LA EJECUCIÓN: No permite que el código siga al servicio
+        return; 
       }
     }
   
-    // 2. PROCESAMIENTO DE ENVÍO
     if (this.esEdicion && this.idProyectoEdicion) {
-      // Lógica de ACTUALIZAR
       this.proyectoService.actualizarProyecto(this.idProyectoEdicion, this.proyecto).subscribe({
         next: () => this.mostrarExito('Propiedad actualizada con éxito.'),
         error: (err) => this.mostrarError(err)
       });
     } else {
-      // Lógica de CREAR
       this.proyectoService.crearProyecto(this.proyecto).subscribe({
         next: () => this.mostrarExito('Propiedad registrada en Fusagasugá.'),
         error: (err) => this.mostrarError(err)
@@ -99,7 +151,6 @@ export class CrearPropiedad implements OnInit {
     }
   }
 
-  // Métodos auxiliares para no repetir código de alertas
   private mostrarExito(mensaje: string): void {
     Swal.fire({
       title: '¡Éxito!',

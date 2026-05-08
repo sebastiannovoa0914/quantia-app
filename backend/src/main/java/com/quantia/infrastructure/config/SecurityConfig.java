@@ -32,24 +32,26 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults()) 
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // 1. PERMITIR PRE-FLIGHT (CORS)
+                // 1. PERMITIR PRE-FLIGHT (CORS) - Vital para que el navegador autorice PUT/DELETE
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // 2. RUTAS PÚBLICAS (Registro y Login)
-                // Se agregan todas las variantes para evitar el 403 "fantasma"
                 .requestMatchers("/auth/**", "/api/auth/**").permitAll()
-                .requestMatchers("/auth/register", "/auth/login", "/api/auth/register", "/api/auth/login").permitAll()
 
                 // 3. MOVIMIENTOS
                 .requestMatchers("/api/movimientos/**")
                     .hasAnyAuthority("ADMINISTRADOR", "CONTADOR")
                 
-                // 4. PROYECTOS (Lectura y Escritura)
+                // 4. PROYECTOS (Jerarquía corregida para Edición)
+                // Permitimos la lectura (lista y por ID) a los roles autorizados
                 .requestMatchers(HttpMethod.GET, "/api/proyectos/**")
                     .hasAnyAuthority("ADMINISTRADOR", "PROPIETARIO", "CONTADOR")
+                
+                // Restringimos creación, edición completa, progreso y eliminación solo a ADMIN
+                // Al usar el comodín /** después de /api/proyectos, cubrimos /api/proyectos/{id}
                 .requestMatchers(HttpMethod.POST, "/api/proyectos/**").hasAuthority("ADMINISTRADOR")
-                .requestMatchers(HttpMethod.PUT, "/api/proyectos/**").hasAuthority("ADMINISTRADOR") // Edición completa
-                .requestMatchers(HttpMethod.PATCH, "/api/proyectos/**").hasAuthority("ADMINISTRADOR") // Progreso
+                .requestMatchers(HttpMethod.PUT, "/api/proyectos/**").hasAuthority("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.PATCH, "/api/proyectos/**").hasAuthority("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.DELETE, "/api/proyectos/**").hasAuthority("ADMINISTRADOR")
 
                 // 5. AGENDA Y HOME
@@ -60,7 +62,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             );
 
-        // Filtro JWT antes del filtro de usuario/contraseña
+        // Inserción del filtro JWT antes del filtro de usuario/contraseña de Spring
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();

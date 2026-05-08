@@ -11,4 +11,6 @@ public class ProyectoResponse {
     private LocalDate fecha_inicio;
     private LocalDate fecha_fin;
     private String nombreAdmin; // Aquí guardaremos el nombre del usuario 11
+    private Double latitud;
+    private Double longitud;
 }

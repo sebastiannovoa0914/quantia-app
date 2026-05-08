@@ -21,19 +21,24 @@ public class ProyectoPersistenceAdapter implements ProyectoRepositoryPort {
     public Proyecto guardar(Proyecto proyecto) {
         ProyectoEntity entity = new ProyectoEntity();
         
-        // Mapeo de Dominios a Entidad
+        // Mapeo de Dominio a Entidad (Para persistir en DB)
+        entity.setIdProyecto(proyecto.getId_proyecto()); // Por si es una actualización
         entity.setNombre(proyecto.getNombre());
         entity.setDescripcion(proyecto.getDescripcion());
         entity.setFechaInicio(proyecto.getFecha_inicio());
         entity.setFechaFin(proyecto.getFecha_fin());
         entity.setIdUsuarioAdmin(proyecto.getId_usuario_admin());
         
-        // IMPORTANTE: Aseguramos que el progreso no sea nulo al guardar por primera vez
+        // Mapeo de nuevos campos de Ubicación
+        entity.setLatitud(proyecto.getLatitud());
+        entity.setLongitud(proyecto.getLongitud());
+        
+        // Aseguramos que el progreso no sea nulo
         entity.setProgreso(proyecto.getProgreso() != null ? proyecto.getProgreso() : 0);
 
         ProyectoEntity savedEntity = jpaRepository.save(entity);
         
-        // Retornamos el modelo con el ID generado por la DB
+        // Retornamos el modelo actualizado con el ID generado
         proyecto.setId_proyecto(savedEntity.getIdProyecto());
         return proyecto;
     }
@@ -50,9 +55,11 @@ public class ProyectoPersistenceAdapter implements ProyectoRepositoryPort {
             p.setFecha_inicio(e.getFechaInicio());
             p.setFecha_fin(e.getFechaFin());
             p.setId_usuario_admin(e.getIdUsuarioAdmin());
-            
-            // MAPEO DEL PROGRESO: Vital para que Angular lo vea al cargar el panel
             p.setProgreso(e.getProgreso() != null ? e.getProgreso() : 0);
+
+            // MAPEO DE UBICACIÓN DESDE LA DB AL DOMINIO
+            p.setLatitud(e.getLatitud());
+            p.setLongitud(e.getLongitud());
 
             if (e.getIdUsuarioAdmin() != null) {
                 usuarioRepository.findById(e.getIdUsuarioAdmin()).ifPresent(user -> {
@@ -63,20 +70,15 @@ public class ProyectoPersistenceAdapter implements ProyectoRepositoryPort {
         }).collect(Collectors.toList());
     }
 
-    /**
-     * Actualiza el progreso de forma independiente.
-     * Este método será llamado por el controlador REST.
-     */
     public void actualizarProgreso(Long id, Integer nuevoProgreso) {
         jpaRepository.findById(id).ifPresent(entity -> {
             entity.setProgreso(nuevoProgreso);
             jpaRepository.save(entity);
         });
     }
+
     @Override
     public void eliminar(Long id) {
-        // Usamos el JpaRepository para borrar por ID
-        // deleteById es un método que ya viene incluido en JpaRepository
         jpaRepository.deleteById(id);
     }
 }

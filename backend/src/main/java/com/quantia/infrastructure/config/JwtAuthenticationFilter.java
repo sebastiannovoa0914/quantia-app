@@ -30,40 +30,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-        String path = request.getServletPath();
-
-        // 1. Omitir validación para login y registro
-        if (path.startsWith("/auth/")) {
+    
+        final String authHeader = request.getHeader("Authorization");
+        final String path = request.getServletPath();
+    
+        // 1. Omitir validación para rutas de autenticación
+        if (path.contains("/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        final String authHeader = request.getHeader("Authorization");
-
+    
+        // 2. Validar que exista el Bearer Token
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-
+    
         try {
             String jwt = authHeader.substring(7);
             String userEmail = jwtUtil.extractEmail(jwt);
-
+    
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
+    
                 if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
                     
-                    // 2. Extraer los roles usando el método de tu JwtUtil
+                    // 3. EXTRACCIÓN DE ROLES (Usando tu método actualizado de JwtUtil)
                     List<String> roles = jwtUtil.extractRoles(jwt);
-
-                    // 3. Mapear autoridades EXACTAMENTE como vienen en el Token (ADMINISTRADOR)
-                    // Eliminamos el .map que añadía "ROLE_"
+    
+                    // 4. MAPEO DE AUTORIDADES
+                    // Transformamos ["ADMINISTRADOR"] en SimpleGrantedAuthority para Spring
                     List<SimpleGrantedAuthority> authorities = roles.stream()
+                            .filter(role -> role != null && !role.isEmpty())
                             .map(SimpleGrantedAuthority::new) 
                             .collect(Collectors.toList());
-
+    
+                    // 5. CREACIÓN DEL TOKEN DE SEGURIDAD
+                    // Es vital pasar 'authorities' para que el hasAuthority de SecurityConfig funcione
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, 
                             null, 
@@ -71,15 +74,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    
+                    // 6. ESTABLECER AUTENTICACIÓN
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     
-                    System.out.println("Quantia Portal - Autoridades cargadas: " + authorities);
+                    // Log de control para ver en la consola de IntelliJ
+                    System.out.println("Quantia Portal - Acceso concedido a: " + userEmail + " con roles: " + authorities);
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error procesando JWT: " + e.getMessage());
+            System.err.println("JWT Filter Error en Quantia Portal: " + e.getMessage());
         }
-
+    
         filterChain.doFilter(request, response);
     }
 }

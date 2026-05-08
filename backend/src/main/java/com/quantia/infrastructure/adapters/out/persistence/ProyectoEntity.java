@@ -29,4 +29,7 @@ public class ProyectoEntity {
     // Nuevo campo para la barra de progreso
     @Column(name = "progreso")
     private Integer progreso; 
+    
+    private Double latitud;
+    private Double longitud;
 }

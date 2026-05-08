@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { ProyectoService } from '../../services/propiedad';
 import { AgendaService } from '../../services/agenda.service';
 import { HostListener } from '@angular/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
@@ -23,7 +24,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    // Si el clic no fue en el botón de los puntos, cerramos el menú
     if (!target.closest('.btn-puntos')) {
       this.menuAbiertoId = null;
     }
@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // --- Gestión de Proyectos ---
   proyectos: any[] = [];
-  menuAbiertoId: number | null = null; // Controla el menú de tres puntos
+  menuAbiertoId: number | null = null; 
   private refreshSub!: Subscription;
 
   // --- Lógica del Calendario / Agenda ---
@@ -53,12 +53,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Recuperar información de sesión
     this.idUsuario = Number(localStorage.getItem('id_usuario'));
     this.nombreUsuario = localStorage.getItem('nombre') || 'Usuario';
     this.rolUsuario = localStorage.getItem('rol')?.toUpperCase() || 'SIN ROL';
 
-    // Suscripción reactiva para refrescar datos automáticamente
     this.refreshSub = this.proyectoService.refreshNeeded$.subscribe(() => {
       this.refrescarTodo();
     });
@@ -66,7 +64,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Limpieza de suscripción para evitar fugas de memoria
     if (this.refreshSub) this.refreshSub.unsubscribe();
   }
 
@@ -76,16 +73,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.cargarProyectosReales();
     this.cargarAgendaReal();
   }
+
   borrarEvento(): void {
     const evento = this.agendaEventos[this.diaSeleccionado!];
-  
     if (evento && evento.id) {
       if (confirm(`¿Estás seguro de que deseas borrar la agenda del día ${this.diaSeleccionado}?`)) {
         this.agendaService.eliminar(evento.id).subscribe({
           next: () => {
             console.log('✅ Evento eliminado correctamente');
             this.cerrarModal();
-            this.refrescarTodo(); // Para que el número en el calendario se limpie
+            this.refrescarTodo(); 
           },
           error: (err) => {
             console.error('❌ Error al eliminar el evento:', err);
@@ -100,12 +97,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.proyectoService.listarProyectos().subscribe({
       next: (data) => {
         this.proyectos = data.map((p: any) => ({
-          // CAMBIO AQUÍ: Usamos id_proyecto para que coincida con tu base de datos
+          // MAPEAMOS ABSOLUTAMENTE TODO
           id: p.id_proyecto, 
           nombre: p.nombre,
           descripcion: p.descripcion,
           progreso: p.progreso || 0,
-          estado: p.estado || 'Activo'
+          estado: p.estado || 'Activo',
+          // ESTAS SON LAS LÍNEAS QUE FALTABAN:
+          latitud: p.latitud,
+          longitud: p.longitud
         }));
         
         console.log('Proyectos mapeados correctamente:', this.proyectos);
@@ -116,42 +116,30 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   cargarAgendaReal(): void {
-    // 1. Ya no dependemos del if(this.idUsuario) para cargar, 
-    // porque la agenda ahora es global para los administradores.
-    this.agendaService.listarEventos().subscribe({ // Usamos el nuevo método del servicio
+    this.agendaService.listarEventos().subscribe({ 
       next: (eventos) => {
         this.agendaEventos = {};
-        
         eventos.forEach(ev => {
-          // Mapeamos los eventos al objeto del calendario usando el día como llave
           this.agendaEventos[ev.dia] = { 
             id: ev.id, 
             titulo: ev.titulo 
           };
         });
-        
         console.log('Agenda cargada con éxito (Modo Global)');
         this.cd.detectChanges();
       },
-      error: (err) => {
-        console.error('Error al cargar agenda global:', err);
-      }
+      error: (err) => console.error('Error al cargar agenda global:', err)
     });
   }
 
   // --- Acciones de Proyectos (Menú de tres puntos) ---
 
   toggleMenu(id: number): void {
-    // Si el id es el mismo que ya está abierto, lo cerramos (null)
-    // Si es uno diferente, abrimos ese y se cierra el anterior automáticamente
     this.menuAbiertoId = this.menuAbiertoId === id ? null : id;
   }
 
   abrirEdicion(proyecto: any): void {
-    this.menuAbiertoId = null; // Cerramos el menú de tres puntos
-    
-    // Redirigimos a la ruta de crear, pero enviando el ID por parámetro
-    // Asegúrate de que 'id' sea el correcto (id_proyecto)
+    this.menuAbiertoId = null; 
     this.router.navigate(['/crear-propiedad'], { queryParams: { id: proyecto.id } });
   }
 
@@ -174,17 +162,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   actualizarProgresoProyecto(proyecto: any, nuevoValor: any): void {
     const progresoNum = Number(nuevoValor);
     proyecto.progreso = progresoNum;
-  
-    // Verificamos en consola si el ID existe antes de enviar
     console.log('Enviando actualización para ID:', proyecto.id);
-  
     this.proyectoService.actualizarProgreso(proyecto.id, progresoNum).subscribe({
-      next: () => {
-        console.log(`✅ Progreso de ${proyecto.nombre} guardado: ${progresoNum}%`);
-      },
-      error: (err) => {
-        console.error('❌ Error al guardar progreso:', err);
-      }
+      next: () => console.log(`✅ Progreso de ${proyecto.nombre} guardado: ${progresoNum}%`),
+      error: (err) => console.error('❌ Error al guardar progreso:', err)
     });
   }
 
@@ -197,30 +178,24 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   guardarEvento() {
-    if (this.diaSeleccionado !== null) { // Quitamos la dependencia obligatoria de idUsuario
+    if (this.diaSeleccionado !== null) {
       const textoTrim = this.nuevoEventoTexto.trim();
       if (textoTrim !== '') {
-        
         const eventoExistente = this.agendaEventos[this.diaSeleccionado];
-  
         const eventoRequest: any = {
           titulo: textoTrim,
           dia: this.diaSeleccionado,
           mesAnio: this.mesActual,
-          idUsuario: this.idUsuario // Lo dejamos por si tu DB lo requiere, pero ya no es el filtro
+          idUsuario: this.idUsuario 
         };
-  
-        // Si es una edición, agregamos el ID; si es nuevo, NO enviamos la propiedad 'id'
         if (eventoExistente && eventoExistente.id) {
           eventoRequest.id = eventoExistente.id;
         }
-  
         console.log('Enviando a la agenda global:', eventoRequest);
-  
         this.agendaService.guardar(eventoRequest).subscribe({
           next: () => {
             this.cerrarModal();
-            this.refrescarTodo(); // Asegúrate de que refrescarTodo use el nuevo listarEventos() sin ID
+            this.refrescarTodo(); 
           },
           error: (err) => {
             console.error('Error al procesar evento:', err);
@@ -235,6 +210,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.mostrarModal = false;
     this.diaSeleccionado = null;
     this.nuevoEventoTexto = '';
+  }
+
+  verUbicacion(lat: number, lng: number): void {
+    console.log("Latitud:", lat, "Longitud:", lng);
+    if (lat != null && lng != null) {
+      // URL corregida para Google Maps
+      const url = `https://www.google.com/maps?q=${lat},${lng}`;
+      window.open(url, '_blank');
+    } else {
+      Swal.fire({
+        title: 'Sin coordenadas',
+        text: 'Este proyecto no tiene ubicación guardada.',
+        icon: 'info',
+        background: '#111',
+        color: '#fff'
+      });
+    }
   }
 
   // --- Sesión ---

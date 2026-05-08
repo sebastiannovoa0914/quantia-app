@@ -42,8 +42,14 @@
 
       <div>
         <label style="display: block; color: #2ecc71; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Descripción Detallada</label>
-        <textarea name="descripcion" [(ngModel)]="proyecto.descripcion" rows="4" 
+        <textarea name="descripcion" [(ngModel)]="proyecto.descripcion" rows="3" 
                   style="width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 6px; color: white; outline: none; resize: none;"></textarea>
+      </div>
+
+      <div>
+        <label style="display: block; color: #2ecc71; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Ubicación en Mapa</label>
+        <div id="map" style="height: 250px; width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; overflow: hidden; z-index: 1;"></div>
+        <p style="color: #555; font-size: 11px; margin-top: 5px;">* Arrastra el marcador o haz clic para definir la ubicación exacta.</p>
       </div>
 
       <button type="submit" [disabled]="!propiedadForm.form.valid"
