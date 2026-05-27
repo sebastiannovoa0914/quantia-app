@@ -2,15 +2,15 @@ describe('Agenda - Crear Evento', () => {
 
     beforeEach(() => {
       cy.visit('/login');
-      cy.get('input[name="email"]').type('nuevo_usuario_mayo@quantia.com');
-      cy.get('input[name="contrasena"]').type('clave12345');
+      cy.get('input[name="email"]').type('nuevo_intentofinal_01@quantia.com');
+      cy.get('input[name="contrasena"]').type('clave12');
       cy.get('button[type="submit"]').click();
       cy.url().should('include', '/home');
     });
   
     it('Debe ejecutar la creación del evento rápidamente', () => {
       // 1. Clic en el día 10 (con fuerza para asegurar que el evento dispare el modal)
-      cy.contains('10').click({ force: true });
+      cy.contains('28').click({ force: true });
   
       // 2. Escribir el texto
       // Quitamos el .should('be.visible') para que no se detenga a validar

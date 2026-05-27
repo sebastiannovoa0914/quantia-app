@@ -3,8 +3,8 @@ describe('Gestión de Proyectos - Quantia Portal', () => {
     beforeEach(() => {
       cy.visit('/login');
       // Usamos tus credenciales confirmadas
-      cy.get('input[name="email"]').type('nuevo_usuario_mayo@quantia.com');
-      cy.get('input[name="contrasena"]').type('clave12345');
+      cy.get('input[name="email"]').type('nuevo_intentofinal_01@quantia.com');
+      cy.get('input[name="contrasena"]').type('clave12');
       cy.get('button[type="submit"]').click();
       cy.url().should('include', '/home');
     });

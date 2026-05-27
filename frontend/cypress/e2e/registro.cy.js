@@ -1,11 +1,11 @@
 it('Debe registrar un nuevo usuario exitosamente', () => {
-  cy.visit('http://localhost:4200/registro');
+  cy.visit('http://localhost:80/registro');
 
   // IMPORTANTE: Cambia el correo a uno nuevo cada vez que pruebes 
   // para evitar errores de "Email ya existe" en el servidor.
   cy.get('input[name="nombre"]').type('Sebastian Novoa');
-  cy.get('input[name="email"]').type('nuevo_intento_final_01@quantia.com'); 
-  cy.get('input[name="contrasena"]').type('clave123');
+  cy.get('input[name="email"]').type('nuevo_intentofinal_01@quantia.co'); 
+  cy.get('input[name="contrasena"]').type('clave12');
 
   cy.get('button[type="submit"]').click();
 

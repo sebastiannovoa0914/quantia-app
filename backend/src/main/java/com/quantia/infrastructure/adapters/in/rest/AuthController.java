@@ -16,6 +16,7 @@ import java.util.Map;
  * evitando conflictos de puertos y errores 403 en Docker.
  */
 @RestController
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 @RequestMapping("/auth")
 public class AuthController {
 

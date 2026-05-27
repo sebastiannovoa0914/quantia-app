@@ -1,0 +1,252 @@
+<div style="display: flex; min-height: 100vh; background: #0a0a0a; font-family: 'Segoe UI', Roboto, sans-serif; color: white;">
+  
+  <aside style="width: 260px; background: #111111; border-right: 1px solid #222; padding: 30px 20px; display: flex; flex-direction: column; gap: 40px;">
+    <div style="color: #2ecc71; font-size: 24px; font-weight: 800; letter-spacing: 1px; padding-left: 10px;">QUANTIA</div>
+    
+    <nav style="display: flex; flex-direction: column; gap: 10px;">
+      <div [routerLink]="['/home']" 
+           style="padding: 12px 15px; border-radius: 8px; color: #888; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: all 0.2s;"
+           onmouseover="this.style.color='#fff'; this.style.background='#1a1a1a'" 
+           onmouseout="this.style.color='#888'; this.style.background='transparent'">
+        <span>📁</span> Proyectos
+      </div>
+      
+      <div [routerLink]="['/contabilidad']" 
+           style="padding: 12px 15px; border-radius: 8px; background: #2ecc71; color: #000; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px;">
+        <span>💼</span> Contabilidad
+      </div>
+      
+      <div [routerLink]="['/usuarios']"
+           style="padding: 12px 15px; border-radius: 8px; color: #888; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: all 0.2s;"
+           onmouseover="this.style.color='#fff'; this.style.background='#1a1a1a'" 
+           onmouseout="this.style.color='#888'; this.style.background='transparent'">
+        <span>⚙️</span> Gestión de Usuarios
+      </div>
+    </nav>
+  </aside>
+  
+    <main style="flex: 1; padding: 30px; overflow-y: auto;">
+      
+      <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <div>
+          <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Control Financiero</h1>
+          <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Seguimiento de costos, pagos y flujos de caja por proyecto</p>
+        </div>
+  
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="color: #888; font-size: 13px;">Filtrar Obra:</span>
+          <select (change)="onProyectoChange($event)" 
+          style="background: #111; color: white; border: 1px solid #333; padding: 8px 15px; border-radius: 6px; font-size: 13px; outline: none; cursor: pointer; border-color: #2ecc71;">
+    <option value="0">Todos los proyectos activos</option>
+    
+    <option *ngFor="let p of proyectos" [value]="p.id">{{ p.nombre }}</option>
+  </select>
+        </div>
+      </header>
+  
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 40px;">
+        
+        <div style="background: #111; border: 1px solid #222; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: #888; text-transform: uppercase; font-weight: 600;">Total Ingresos / Aportes</span>
+              <span style="color: #2ecc71; background: rgba(46,204,113,0.1); padding: 4px 8px; border-radius: 6px; font-size: 12px;">📈</span>
+            </div>
+            <div style="font-size: 24px; font-weight: 800; color: #fff;">$ {{ totalIngresos | number:'1.0-0' }}</div>
+            <span style="font-size: 11px; color: #555;">Fondos totales inyectados u obtenidos</span>
+          </div>
+          
+          <div style="background: #111; border: 1px solid #222; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: #888; text-transform: uppercase; font-weight: 600;">Total Costos / Pagos</span>
+              <span style="color: #e74c3c; background: rgba(231,76,60,0.1); padding: 4px 8px; border-radius: 6px; font-size: 12px;">📉</span>
+            </div>
+            <div style="font-size: 24px; font-weight: 800; color: #e74c3c;">$ {{ totalEgresos | number:'1.0-0' }}</div>
+            <span style="font-size: 11px; color: #555;">Gastos operativos, materiales y mano de obra</span>
+          </div>
+          
+          <div style="background: #111; border: 1px solid #222; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; border-color: rgba(46,204,113,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 12px; color: #2ecc71; text-transform: uppercase; font-weight: 600;">Balance en Caja</span>
+              <span style="color: #2ecc71; background: rgba(46,204,113,0.2); padding: 4px 8px; border-radius: 6px; font-size: 12px;">💰</span>
+            </div>
+            <div style="font-size: 24px; font-weight: 800; color: #2ecc71;">$ {{ balanceCaja | number:'1.0-0' }}</div>
+            <span style="font-size: 11px; color: #888;">Utilidad / Disponible actual para ejecución</span>
+          </div>
+  
+      </div>
+  
+      <section style="background: #111; border: 1px solid #222; border-radius: 12px; padding: 25px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+          <h2 style="font-size: 16px; margin: 0; color: white; text-transform: uppercase; letter-spacing: 0.5px;">Historial de Transacciones</h2>
+          
+          <div style="display: flex; gap: 10px;">
+            <button (click)="abrirGrafico()" 
+                    style="background: #222; color: #fff; border: 1px solid #444; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <span>📊</span> VER REPORTE
+            </button>
+        
+            <button (click)="abrirModal()" 
+                    style="background: #2ecc71; color: #000; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <span>+</span> REGISTRAR MOVIMIENTO
+            </button>
+          </div>
+        </div>
+  
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+              <tr style="text-align: left; color: #555; font-size: 11px; text-transform: uppercase;">
+                <th style="padding: 10px;">Factura</th>
+                <th style="padding: 10px;">Fecha</th>
+                <th style="padding: 10px;">Concepto</th>
+                <th style="padding: 10px;">Responsable</th>
+                <th style="padding: 10px;">Tipo</th>
+                <th style="padding: 10px; text-align: right;">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of transacciones" 
+                  style="border-bottom: 1px solid #1a1a1a; transition: background 0.2s;" 
+                  onmouseover="this.style.background='#161616'" 
+                  onmouseout="this.style.background='transparent'">
+                
+                <td style="padding: 15px 10px; color: #2ecc71; font-family: monospace; font-weight: 600;">{{ m.numeroFactura }}</td>
+                <td style="padding: 15px 10px; color: #fff; font-size: 13px;">{{ m.fecha }}</td>
+                <td style="padding: 15px 10px; color: #eee;">
+                  <div style="font-weight: 600;">{{ m.descripcion }}</div>
+                  <div style="font-size: 11px; color: #555;">Proyecto: {{ m.proyecto?.nombre }}</div>
+                </td>
+                <td style="padding: 15px 10px; color: #fff;">{{ m.socioResponsable }}</td>
+                <td style="padding: 15px 10px;">
+                  <span [style.color]="m.tipo === 'INGRESO' ? '#2ecc71' : '#e74c3c'" 
+                        style="background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                    {{ m.tipo }}
+                  </span>
+                </td>
+                <td style="padding: 15px 10px; text-align: right; font-weight: 700;"
+                    [style.color]="m.tipo === 'INGRESO' ? '#2ecc71' : '#e74c3c'">
+                  {{ m.valor | currency:'USD':'symbol':'1.0-0' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      </section>
+  
+    </main>
+    <div *ngIf="mostrarModal" class="modal-overlay">
+        <div class="modal-content" style="background: #111; padding: 30px; border-radius: 12px; border: 1px solid #222; width: 500px; color: white; font-family: 'Segoe UI', Roboto, sans-serif; position: fixed; top: 10%; left: 35%; z-index: 1000;">
+          
+          <h2 style="margin: 0 0 20px 0; font-size: 20px; color: #fff;">Registrar Movimiento</h2>
+          
+          <form (ngSubmit)="guardarMovimiento()" style="display:flex; flex-direction:column; gap:15px;">
+            
+            <div>
+              <label style="font-size: 12px; color: #2ecc71; text-transform: uppercase; font-weight: 600;">Proyecto</label>
+              <select [(ngModel)]="nuevoMovimiento.idProyecto" name="idProyecto" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 6px; margin-top: 5px;" required>
+                <option [ngValue]="null">Seleccione la obra</option>
+                <option *ngFor="let p of proyectos" [value]="p.id">{{ p.nombre }}</option>
+              </select>
+            </div>
+      
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                  <label style="font-size: 12px; color: #2ecc71; text-transform: uppercase; font-weight: 600;">Factura #</label>
+                  <input [(ngModel)]="nuevoMovimiento.numeroFactura" name="factura" placeholder="Ej: FAC-001" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 6px; margin-top: 5px;" required>
+                </div>
+                
+                <div>
+                  <label style="font-size: 12px; color: #2ecc71; text-transform: uppercase; font-weight: 600;">Fecha</label>
+                  <div style="position: relative; margin-top: 5px;">
+                    <input type="date" 
+                           [(ngModel)]="nuevoMovimiento.fecha" 
+                           name="fecha" 
+                           [min]="fechaMinima" 
+                           style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 6px; box-sizing: border-box; cursor: pointer;" 
+                           required>
+                    <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 14px;">📅</span>
+                  </div>
+                </div>
+              </div>
+      
+            <div>
+              <label style="font-size: 12px; color: #2ecc71; text-transform: uppercase; font-weight: 600;">Socio Responsable</label>
+              <input [(ngModel)]="nuevoMovimiento.socioResponsable" name="socio" placeholder="Nombre del socio" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 6px; margin-top: 5px;" required>
+            </div>
+      
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div>
+                <label style="font-size: 12px; color: #2ecc71; text-transform: uppercase; font-weight: 600;">Tipo</label>
+                <select [(ngModel)]="nuevoMovimiento.tipo" name="tipo" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 6px; margin-top: 5px;">
+                  <option value="INGRESO">INGRESO</option>
+                  <option value="EGRESO">EGRESO</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 12px; color: #2ecc71; text-transform: uppercase; font-weight: 600;">Valor</label>
+                <input type="number" [(ngModel)]="nuevoMovimiento.valor" name="valor" placeholder="$ 0" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 6px; margin-top: 5px;" required>
+              </div>
+            </div>
+      
+            <div>
+              <label style="font-size: 12px; color: #2ecc71; text-transform: uppercase; font-weight: 600;">Descripción Detallada</label>
+              <textarea [(ngModel)]="nuevoMovimiento.descripcion" name="desc" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 6px; margin-top: 5px; height: 60px;"></textarea>
+            </div>
+      
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              <button type="button" (click)="cerrarModal()" style="flex: 1; padding: 12px; background: transparent; border: 1px solid #333; color: #888; border-radius: 6px; cursor: pointer;">Cancelar</button>
+              <button type="submit" style="flex: 1; padding: 12px; background: #2ecc71; border: none; color: #000; border-radius: 6px; font-weight: 700; cursor: pointer;">Registrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div *ngIf="mostrarGrafico" style="position: fixed; top:0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 2000;">
+        <div style="background: #151515; padding: 40px; border-radius: 20px; width: 700px; color: white;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0;">Análisis Financiero</h2>
+            <button (click)="cerrarGrafico()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">✕</button>
+          </div>
+      
+          <div style="display: flex; gap: 40px; margin-top: 40px; align-items: center; justify-content: center;">
+            
+            <div style="text-align: center;">
+              <div [style.background]="'conic-gradient(#2ecc71 0% ' + (totalIngresos > 0 ? (totalIngresos / (totalIngresos + totalEgresos) * 100) : 0) + '%, #e74c3c 0% 100%)'" 
+                   style="width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; margin: 0 auto;">
+                <div style="width: 100px; height: 100px; background: #151515; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px;">
+                  <div>Proporción</div>
+                </div>
+              </div>
+              <div style="margin-top: 15px; display: flex; gap: 15px; justify-content: center;">
+                <div style="font-size: 12px;"><span style="color: #2ecc71;">●</span> Ingresos: {{ totalIngresos > 0 ? ((totalIngresos / (totalIngresos + totalEgresos) * 100) | number:'1.0-0') : 0 }}%</div>
+                <div style="font-size: 12px;"><span style="color: #e74c3c;">●</span> Egresos: {{ (totalIngresos + totalEgresos) > 0 ? ((totalEgresos / (totalIngresos + totalEgresos) * 100) | number:'1.0-0') : 0 }}%</div>
+              </div>
+            </div>
+      
+            <div style="display: flex; gap: 20px; align-items: flex-end; height: 220px;">
+              <div style="text-align: center;">
+                <div style="background: #333; height: 180px; width: 60px; border-radius: 8px; position: relative; overflow: hidden;">
+                  <div [style.height.%]="100" style="background: #2ecc71; position: absolute; bottom: 0; width: 100%;"></div>
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: #aaa;">Ingresos</div>
+                <div style="font-weight: bold; font-size: 14px;">${{ totalIngresos | number }}</div>
+              </div>
+      
+              <div style="text-align: center;">
+                <div style="background: #333; height: 180px; width: 60px; border-radius: 8px; position: relative; overflow: hidden;">
+                  <div [style.height.%]="(totalEgresos / (totalIngresos > 0 ? totalIngresos : 1)) * 100" style="background: #e74c3c; position: absolute; bottom: 0; width: 100%;"></div>
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: #aaa;">Egresos</div>
+                <div style="font-weight: bold; font-size: 14px;">${{ totalEgresos | number }}</div>
+              </div>
+            </div>
+          </div>
+      
+          <div style="display: flex; justify-content: space-around; margin-top: 30px; padding: 20px; background: #1a1a1a; border-radius: 12px;">
+            <div>
+              <div style="color: #888; font-size: 12px;">BALANCE TOTAL</div>
+              <div style="font-size: 24px; font-weight: bold;">${{ balanceCaja | number }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>

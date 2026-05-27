@@ -21,7 +21,7 @@ public class UsuarioRepositoryAdapter implements UsuarioRepositoryPort {
         entity.setEmail(usuario.getEmail());
         entity.setContrasena(usuario.getContrasena());
         entity.setRol(Rol.valueOf(usuario.getRol()));
-        entity.setActivo(usuario.isActivo());
+        entity.setActivo(usuario.getActivo());
         
         UsuarioEntity savedEntity = jpaRepository.save(entity);
         usuario.setId(savedEntity.getIdUsuario());

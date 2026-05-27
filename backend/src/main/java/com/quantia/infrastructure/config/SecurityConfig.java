@@ -32,6 +32,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .cors(Customizer.withDefaults()) 
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.POST, "/api/funciones/propietario").hasAuthority("ADMINISTRADOR")
             // 1. PERMITIR PRE-FLIGHT (CORS) - Vital para que el navegador autorice PUT/DELETE
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
@@ -43,6 +44,9 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                 "/swagger-resources/**",
                 "/webjars/**"
             ).permitAll()
+
+            .requestMatchers("/api/contabilidad/**").hasAnyAuthority("ADMINISTRADOR", "CONTADOR")
+            
 
             // 2. RUTAS PÚBLICAS (Registro y Login)
             .requestMatchers("/auth/**", "/api/auth/**").permitAll()
@@ -84,11 +88,32 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200")); 
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control", "Origin", "Accept"));
-        config.setAllowCredentials(true);
         
+        // CORRECCIÓN: Lista de Strings limpia, sin comillas internas
+        config.setAllowedOrigins(List.of(
+            "http://localhost",
+            "http://127.0.0.1",
+            "http://localhost:4200"
+        )); 
+        
+        // Métodos permitidos
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        
+        // Headers permitidos (Solo una vez y bien completo)
+        config.setAllowedHeaders(List.of(
+            "Authorization", 
+            "Content-Type", 
+            "Cache-Control", 
+            "Origin", 
+            "Accept", 
+            "X-Requested-With",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
+        
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L); 
+    
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

@@ -1,10 +1,10 @@
 describe('Flujo de Login - Quantia Portal', () => {
   it('Debe iniciar sesión con un usuario válido', () => {
-    cy.visit('http://localhost:4200/login');
+    cy.visit('http://localhost:80/login');
 
     // Usamos las credenciales que ya confirmamos en tu MySQL
-    cy.get('input[name="email"]').type('nuevo_usuario_mayo@quantia.com');
-    cy.get('input[name="contrasena"]').type('clave12345');
+    cy.get('input[name="email"]').type('nuevo_intentofinal_01@quantia.co');
+    cy.get('input[name="contrasena"]').type('clave12');
 
     cy.get('button[type="submit"]').click();
 

@@ -53,4 +53,21 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }
+  getRol(): string {
+    // Primero intenta obtenerlo del localStorage
+    const rol = localStorage.getItem('rol');
+    return rol ? rol : '';
+  }
+  
+  isAdmin(): boolean {
+    return this.getRol() === 'ADMINISTRADOR';
+  }
+  
+  isContador(): boolean {
+    return this.getRol() === 'CONTADOR';
+  }
+  
+  isPropietario(): boolean {
+    return this.getRol() === 'PROPIETARIO';
+  }
 }

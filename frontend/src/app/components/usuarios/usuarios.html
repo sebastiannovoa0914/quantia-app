@@ -1,0 +1,72 @@
+<div style="display: flex; min-height: 100vh; background: #0a0a0a; font-family: 'Segoe UI', Roboto, sans-serif; color: white;">
+  
+    <aside style="width: 260px; background: #111111; border-right: 1px solid #222; padding: 30px 20px; display: flex; flex-direction: column; gap: 40px;">
+      <div style="color: #2ecc71; font-size: 24px; font-weight: 800; letter-spacing: 1px; padding-left: 10px;">QUANTIA</div>
+      
+      <nav style="display: flex; flex-direction: column; gap: 10px;">
+        <div [routerLink]="['/home']" 
+             style="padding: 12px 15px; border-radius: 8px; color: #888; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: all 0.2s;"
+             onmouseover="this.style.color='#fff'; this.style.background='#1a1a1a'" 
+             onmouseout="this.style.color='#888'; this.style.background='transparent'">
+          <span>📁</span> Proyectos
+        </div>
+        
+        <div [routerLink]="['/contabilidad']" 
+             style="padding: 12px 15px; border-radius: 8px; color: #888; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: all 0.2s;"
+             onmouseover="this.style.color='#fff'; this.style.background='#1a1a1a'" 
+             onmouseout="this.style.color='#888'; this.style.background='transparent'">
+          <span>💼</span> Contabilidad
+        </div>
+        
+        <div style="padding: 12px 15px; border-radius: 8px; background: #2ecc71; color: #000; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px;">
+          <span>⚙️</span> Gestión de Usuarios
+        </div>
+      </nav>
+    </aside>
+  
+    <main style="flex: 1; padding: 30px; overflow-y: auto;">
+      <div class="container">
+        <div class="header-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+          <h1 style="margin: 0; color: white;">Gestión de Usuarios</h1>
+          <button class="btn-principal" (click)="abrirModal()" style="background: #2ecc71; color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+            + Nuevo Propietario
+          </button>
+        </div>
+   
+        <div class="info-card" style="background: #111; border: 1px solid #222; padding: 20px; border-radius: 12px; color: #888;">
+          <p>Desde aquí puedes crear perfiles para los propietarios de los proyectos.</p>
+        </div>
+  
+        <div *ngIf="mostrarModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+          <div class="modal-content" style="background: #111; border: 1px solid #2ecc71; padding: 30px; border-radius: 12px; width: 400px;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+              <h2 style="margin: 0; color: white;">Registrar Propietario</h2>
+              <button (click)="cerrarModal()" style="background: none; border: none; color: white; cursor: pointer;">✕</button>
+            </div>
+   
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px;">
+              <div class="form-group">
+                <label style="color: #888; font-size: 12px;">Nombre Completo</label>
+                <input type="text" [(ngModel)]="nuevoPropietario.nombre" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 6px;">
+              </div>
+   
+              <div class="form-group">
+                <label style="color: #888; font-size: 12px;">Correo Electrónico</label>
+                <input type="email" [(ngModel)]="nuevoPropietario.email" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 6px;">
+              </div>
+   
+              <div class="form-group">
+                <label style="color: #888; font-size: 12px;">Contraseña Temporal</label>
+                <input type="password" [(ngModel)]="nuevoPropietario.contrasena" style="width: 100%; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 6px;">
+              </div>
+            </div>
+   
+            <div class="modal-footer" style="margin-top: 25px; display: flex; gap: 10px;">
+              <button (click)="cerrarModal()" style="flex: 1; padding: 10px; background: transparent; border: 1px solid #333; color: #888; border-radius: 6px; cursor: pointer;">Cancelar</button>
+              <button (click)="guardarPropietario()" style="flex: 1; padding: 10px; background: #2ecc71; border: none; color: #000; border-radius: 6px; font-weight: bold; cursor: pointer;">Crear Perfil</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>

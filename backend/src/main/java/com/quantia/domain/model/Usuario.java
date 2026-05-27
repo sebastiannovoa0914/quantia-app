@@ -13,5 +13,5 @@ public class Usuario {
     private String email;
     private String contrasena;
     private String rol; // ADMINISTRADOR, CONTADOR, PROPIETARIO
-    private boolean activo;
+    private Boolean activo;
 }
