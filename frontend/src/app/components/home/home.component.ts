@@ -238,4 +238,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   irAUsuarios() {
     this.router.navigate(['/usuarios']);
   }
+  get isAdmin(): boolean {
+    return this.authService.isAdmin(); // Usando el método que creamos
+  }
+  
+  get isPropietario(): boolean {
+    return this.authService.isPropietario();
+  }
+  get canEditProyectos(): boolean {
+    return this.authService.isAdmin(); // Solo admin puede editar/borrar
+  }
 }

@@ -19,4 +19,7 @@ public class Proyecto {
     private Integer progreso;
     private Double latitud;
     private Double longitud;
+    public Long getId() {
+        return this.id_proyecto;
+    }
 }

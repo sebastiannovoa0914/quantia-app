@@ -45,7 +45,11 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                 "/webjars/**"
             ).permitAll()
 
-            .requestMatchers("/api/contabilidad/**").hasAnyAuthority("ADMINISTRADOR", "CONTADOR")
+            // 1. Permiso total para todos los métodos GET en contabilidad
+.requestMatchers(HttpMethod.GET, "/api/contabilidad/**").permitAll()
+
+// 2. Solo Admin puede registrar (POST)
+.requestMatchers(HttpMethod.POST, "/api/contabilidad/registrar").hasAuthority("ADMINISTRADOR")
             
 
             // 2. RUTAS PÚBLICAS (Registro y Login)

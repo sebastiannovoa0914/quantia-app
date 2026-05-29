@@ -5,9 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { ProyectoService } from '../../services/propiedad'; 
 import { ContabilidadService } from '../../services/contabilidad';
 
-
-
-
 @Component({
   selector: 'app-contabilidad',
   standalone: true,
@@ -165,8 +162,16 @@ export class ContabilidadComponent implements OnInit {
   
   public donutData: any = { labels: [], datasets: [] };
   public barData: any = { labels: [], datasets: [] };
+  get rolUsuario(): string {
+    // Ajusta 'rol' según la clave que uses en tu localStorage
+    return localStorage.getItem('rol') || ''; 
+  }
   
- 
-
-
+  get esAdmin(): boolean {
+    return this.rolUsuario.trim() === 'ADMINISTRADOR';
+  }
+  
+  get esPropietario(): boolean {
+    return this.rolUsuario.trim() === 'PROPIETARIO';
+  }
 }

@@ -16,12 +16,13 @@
         <span>💼</span> Contabilidad
       </div>
       
-      <div [routerLink]="['/usuarios']"
-           style="padding: 12px 15px; border-radius: 8px; color: #888; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: all 0.2s;"
-           onmouseover="this.style.color='#fff'; this.style.background='#1a1a1a'" 
-           onmouseout="this.style.color='#888'; this.style.background='transparent'">
-        <span>⚙️</span> Gestión de Usuarios
-      </div>
+      <div *ngIf="esAdmin"
+      [routerLink]="['/usuarios']"
+      style="padding: 12px 15px; border-radius: 8px; color: #888; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: all 0.2s;"
+      onmouseover="this.style.color='#fff'; this.style.background='#1a1a1a'" 
+      onmouseout="this.style.color='#888'; this.style.background='transparent'">
+   <span>⚙️</span> Gestión de Usuarios
+ </div>
     </nav>
   </aside>
   
@@ -37,7 +38,7 @@
           <span style="color: #888; font-size: 13px;">Filtrar Obra:</span>
           <select (change)="onProyectoChange($event)" 
           style="background: #111; color: white; border: 1px solid #333; padding: 8px 15px; border-radius: 6px; font-size: 13px; outline: none; cursor: pointer; border-color: #2ecc71;">
-    <option value="0">Todos los proyectos activos</option>
+    
     
     <option *ngFor="let p of proyectos" [value]="p.id">{{ p.nombre }}</option>
   </select>
@@ -87,9 +88,12 @@
             </button>
         
             <button (click)="abrirModal()" 
-                    style="background: #2ecc71; color: #000; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-              <span>+</span> REGISTRAR MOVIMIENTO
-            </button>
+            [disabled]="rolUsuario === 'PROPIETARIO'"
+            [style.opacity]="rolUsuario === 'PROPIETARIO' ? '0.3' : '1'"
+            [style.cursor]="rolUsuario === 'PROPIETARIO' ? 'not-allowed' : 'pointer'"
+            style="background: #2ecc71; color: #000; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+      <span>+</span> REGISTRAR MOVIMIENTO
+    </button>
           </div>
         </div>
   
